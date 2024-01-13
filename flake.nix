@@ -3,25 +3,28 @@
 
   inputs.nixpkgs.url = "nixpkgs/nixos-unstable";
   inputs.flake-utils.url = "github:numtide/flake-utils";
-  inputs.nvim-config.url = "github:jalil-salame/nvim-config";
-  inputs.nvim-config.inputs.nixpkgs.follows = "nixpkgs";
-  inputs.nvim-config.inputs.flake-utils.follows = "flake-utils";
-  inputs.nvim-config.inputs.home-manager.follows = "home-manager";
-  inputs.home-manager.url = "github:nix-community/home-manager";
-  inputs.home-manager.inputs.nixpkgs.follows = "nixpkgs";
+  # inputs.nvim-config.url = "github:jalil-salame/nvim-config";
+  # inputs.nvim-config.inputs.nixpkgs.follows = "nixpkgs";
+  # inputs.nvim-config.inputs.flake-utils.follows = "flake-utils";
+  # inputs.nvim-config.inputs.home-manager.follows = "home-manager";
+  # inputs.home-manager.url = "github:nix-community/home-manager";
+  # inputs.home-manager.inputs.nixpkgs.follows = "nixpkgs";
 
-  outputs = { self, nixpkgs, home-manager, nvim-config, flake-utils }:
+  outputs = { self, nixpkgs, flake-utils }:
     flake-utils.lib.eachDefaultSystem (system:
       let
-        nvimModules = unstable:
-          if unstable
-          then with nvim-config.nixosModules; [ nvim-config nixneovim ]
-          else with nvim-config.nixosModules; [ nvim-config nixneovim-23-11 ];
-        overlays = [ nvim-config.overlays.nixneovim nvim-config.overlays.neovim-nightly ];
-        pkgs = import nixpkgs { inherit system overlays; };
+        pkgs = import nixpkgs { inherit system; };
       in
       {
         formatter = pkgs.nixpkgs-fmt;
-        lib.home-manager = import ./home { inherit nvimModules; };
+        nixosModules = rec {
+          default = homeManager;
+          homeManager = homeManager-24-05;
+          homeManager-24-05 = import ./home { state = 2405; };
+          homeManager-23-11 = import ./home { state = 2311; };
+          users = users-24-05;
+          users-24-05 = import ./home { state = 2405; };
+          users-23-11 = import ./home { state = 2311; };
+        };
       });
 }
