@@ -3,6 +3,7 @@ let jhome = config.jhome; in
 {
   imports = [
     ./gui
+    ./users.nix
   ];
 
   options = {

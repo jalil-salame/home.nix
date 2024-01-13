@@ -22,9 +22,6 @@
           homeManager = homeManager-24-05;
           homeManager-24-05 = import ./home { state = 2405; };
           homeManager-23-11 = import ./home { state = 2311; };
-          users = users-24-05;
-          users-24-05 = import ./home { state = 2405; };
-          users-23-11 = import ./home { state = 2311; };
         };
       });
 }
