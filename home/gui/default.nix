@@ -8,10 +8,11 @@ let
   cursor.name = "Nordzy-cursors";
   iconTheme.name = "Papirus-Dark";
   iconTheme.package = pkgs.papirus-icon-theme;
+  orDefault = val: default: if val != null then val else default;
 in
 {
   options.jhome.gui = lib.mkOption {
-    description = lib.mdDoc "Configure the GUI.";
+    description = lib.mdDoc "Jalil's default GUI configuration.";
     type = lib.types.submodule {
       options = {
         enable = lib.mkEnableOption (lib.mdDoc "GUI applications");
@@ -32,10 +33,10 @@ in
               background = lib.mkOption {
                 description = lib.mdDoc "The wallpaper to use.";
                 type = lib.types.path;
-                default = builtins.fetchurl {
+                default = orDefault config.stylix.image (builtins.fetchurl {
                   url = "https://raw.githubusercontent.com/lunik1/nixos-logo-gruvbox-wallpaper/d4937c424fad79c1136a904599ba689fcf8d0fad/png/gruvbox-dark-rainbow.png";
                   sha256 = "036gqhbf6s5ddgvfbgn6iqbzgizssyf7820m5815b2gd748jw8zc";
-                };
+                });
               };
               autostart = lib.mkOption {
                 description = lib.mdDoc ''

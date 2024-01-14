@@ -1,14 +1,14 @@
-{ state }: { config, pkgs, lib, ... }:
+{ stylix }: { config, pkgs, lib, ... }:
 let
   inherit (lib) types;
-  jhome = config.jhome;
-  devcfg = jhome.dev;
+  cfg = config.jhome;
+  devcfg = cfg.dev;
 in
 {
   imports = [
     ./gui
     ./users.nix
-  ];
+  ] ++ lib.optional (cfg.enable && cfg.gui.enable) stylix.nixosModules.stylix;
 
   options.jhome = lib.mkOption {
     description = lib.mdDoc "Jalil's home configuration options";
@@ -31,7 +31,7 @@ in
     };
   };
 
-  config = lib.optionalAttrs jhome.enable {
+  config = lib.optionalAttrs cfg.enable {
     # Direnv
     programs.direnv.enable = true;
     programs.direnv.nix-direnv.enable = true;
