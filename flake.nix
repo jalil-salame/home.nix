@@ -15,12 +15,16 @@
       inherit (nixpkgs) lib;
       supportedSystems = [ "x86_64-linux" "aarch64-darwin" "x86_64-darwin" "aarch64-linux" ];
       forEachSupportedSystem = f: lib.genAttrs supportedSystems (system: f (import nixpkgs { inherit system; }));
+      # Module documentation
+      doc = forEachSupportedSystem (pkgs: { doc = import ./docs { inherit pkgs lib; }; });
     in
     {
       # Schemas tell Nix about the structure of your flake's outputs
       schemas = flake-schemas.schemas;
 
       formatter = forEachSupportedSystem (pkgs: pkgs.nixpkgs-fmt);
+
+      packages = doc;
 
       nixosModules = rec {
         default = homeManager;
