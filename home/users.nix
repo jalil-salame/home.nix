@@ -1,7 +1,14 @@
 { config, lib, ... }:
 let
   inherit (lib) types;
-  cfg = config.jhome.user;
+  inherit (config) jhome;
+  inherit (cfg.defaultIdentity) gpgKey;
+
+  cfg = jhome.user;
+  hasConfig = jhome.enable && cfg != null;
+  hasKey = gpgKey != null;
+  gpgHome = config.programs.gpg.homedir;
+  unlockKey = hasConfig && cfg.unlockGpgKeyOnLogin && hasKey;
 in
 {
   options.jhome.user = lib.mkOption {
@@ -37,27 +44,19 @@ in
     };
   };
 
-  config =
-    let
-      hasConfig = cfg != null;
-      inherit (cfg.defaultIdentity) gpgKey;
-      hasKey = gpgKey != null;
-      gpgHome = config.programs.gpg.homedir;
-      unlockKey = hasConfig && cfg.unlockGpgKeyOnLogin && hasKey;
-    in
-    lib.optionalAttrs hasConfig
-      {
-        programs.git.userName = cfg.defaultIdentity.name;
-        programs.git.userEmail = cfg.defaultIdentity.email;
-        programs.git.signing = lib.optionalAttrs hasKey {
-          signByDefault = true;
-          key = gpgKey;
-        };
-      } // lib.optionalAttrs unlockKey {
-      xdg.configFile.pam-gnupg.text = ''
-        ${gpgHome}
+  config = lib.optionalAttrs hasConfig
+    {
+      programs.git.userName = cfg.defaultIdentity.name;
+      programs.git.userEmail = cfg.defaultIdentity.email;
+      programs.git.signing = lib.optionalAttrs hasKey {
+        signByDefault = true;
+        key = gpgKey;
+      };
+    } // lib.optionalAttrs unlockKey {
+    xdg.configFile.pam-gnupg.text = ''
+      ${gpgHome}
 
-        ${gpgKey}
-      '';
-    };
+      ${gpgKey}
+    '';
+  };
 }
