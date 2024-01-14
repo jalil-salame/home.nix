@@ -1,0 +1,43 @@
+name: Deploy Documentation
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      # This workflow
+      - ./.github/workflows/deploy.yml
+      # Docs generation code
+      - ./docs/**
+      # Module options
+      - ./options.nix
+      # Nix files
+      - ./flake.lock
+      - ./flake.nix
+
+jobs:
+  build-website:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: DeterminateSystems/nix-installer-action@v9
+    - uses: DeterminateSystems/magic-nix-cache-action@v2
+    - name: Build documentation
+      run: nix build .#doc --print-build-logs
+    - name: Upload artifact
+      uses: actions/upload-pages-artifact@v1
+      with:
+        path: ./result
+  deploy:
+    needs: build-website
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v2
