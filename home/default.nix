@@ -1,35 +1,14 @@
 { stylix }: { config, pkgs, lib, ... }:
 let
-  inherit (lib) types;
   cfg = config.jhome;
   devcfg = cfg.dev;
 in
 {
   imports = [
+    ../options.nix
     ./gui
     ./users.nix
   ] ++ lib.optional (cfg.enable && cfg.gui.enable) stylix.nixosModules.stylix;
-
-  options.jhome = lib.mkOption {
-    description = lib.mdDoc "Jalil's home configuration options";
-    type = types.submodule {
-      enable = lib.mkEnableOption (lib.mdDoc "jalil's home defaults");
-      hostName = lib.mkOption {
-        description = lib.mdDoc "The hostname of this system.";
-        type = types.str;
-        default = "nixos";
-        example = "my pc";
-      };
-      dev = lib.mkOption {
-        description = lib.mdDoc "Setup development environment for programming languages.";
-        type = types.submodule {
-          options.rust = lib.mkOption {
-            enable = lib.mkEnableOption (lib.mdDoc "rust dev environment");
-          };
-        };
-      };
-    };
-  };
 
   config = lib.optionalAttrs cfg.enable {
     # Direnv
