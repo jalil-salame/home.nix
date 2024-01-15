@@ -1,7 +1,7 @@
 { config, lib, pkgs, osConfig ? null, ... }:
 let
   inherit (config) jhome;
-  flatpakEnabled = if osConfig then osConfig.services.flatpak.enable else false;
+  flatpakEnabled = if osConfig != null then osConfig.services.flatpak.enable else false;
   cfg = jhome.gui;
   swaycfg = config.wayland.windowManager.sway.config;
   cursor.package = pkgs.nordzy-cursor-theme;
@@ -10,10 +10,10 @@ let
   iconTheme.package = pkgs.papirus-icon-theme;
 in
 {
-  config = lib.optionalAttrs (jhome.enable && cfg.enable) {
+  config = lib.mkIf (jhome.enable && cfg.enable) {
     home.packages = [
       pkgs.webcord
-      pkgs.ferduim
+      pkgs.ferdium
       pkgs.xournalpp
       pkgs.signal-desktop
       pkgs.lxqt.pcmanfm-qt
@@ -34,7 +34,7 @@ in
     # Status bar
     programs.waybar.enable = true;
     programs.waybar.systemd.enable = true;
-    programs.waybar.settings = import ./waybar-settings.nix;
+    programs.waybar.settings = import ./waybar-settings.nix { inherit config lib; };
     # Terminal
     programs.wezterm.enable = true;
     programs.wezterm.extraConfig = ''
@@ -63,12 +63,10 @@ in
 
     # Window Manager
     wayland.windowManager.sway.enable = true;
-    wayland.windowManager.sway.config = import ./sway-config.nix;
+    wayland.windowManager.sway.config = import ./sway-config.nix { inherit config pkgs; };
 
     # Set cursor style
     stylix.cursor = cursor;
-    home.pointerCursor.name = cursor.name;
-    home.pointerCursor.package = cursor.package;
     home.pointerCursor.gtk.enable = true;
 
     # Set Gtk theme

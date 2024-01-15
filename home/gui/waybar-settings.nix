@@ -1,4 +1,4 @@
-{ config, lib, ... }:
+{ config, lib }:
 let cfg = config.jhome.gui; in
 {
   mainBar.layer = "top";

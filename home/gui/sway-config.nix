@@ -1,7 +1,7 @@
-{ config, pkgs, ... }:
+{ config, pkgs }:
 let
   cfg = config.jhome.gui.sway;
-  modifier = "mod4";
+  modifier = "Mod4";
   terminal = "wezterm";
   menu = "${pkgs.fuzzel}/bin/fuzzel --terminal 'wezterm start'";
   # currently, there is some friction between sway and gtk:
@@ -40,7 +40,7 @@ let
 in
 {
   inherit modifier terminal menu;
-  keybindings = import ./keybindings.nix;
+  keybindings = import ./keybindings.nix { inherit config pkgs; };
   # Appearance
   bars = [ ]; # Waybar is started as a systemd service
   gaps = {

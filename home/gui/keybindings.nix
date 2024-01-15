@@ -1,8 +1,4 @@
-{ pkgs
-, config
-, mod
-, ...
-}:
+{ pkgs, config }:
 let
   cfg = config.jhome.gui.sway;
   passmenu = "${pkgs.jpassmenu}/bin/jpassmenu";
@@ -49,6 +45,7 @@ let
     fi
   '';
   swayconf = config.wayland.windowManager.sway.config;
+  mod = swayconf.modifier;
   workspaces = map toString [ 1 2 3 4 5 6 7 8 9 ];
   dirs =
     map
@@ -120,4 +117,4 @@ builtins.foldl' (l: r: l // r)
     ++ resizeWindowKeybinds
     ++ focusWorkspaceKeybindings
     ++ moveWorkspaceKeybindings
-  ++ moveFocusWorkspaceKeybindings)
+    ++ moveFocusWorkspaceKeybindings)

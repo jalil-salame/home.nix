@@ -10,15 +10,15 @@ let
   unlockKey = hasConfig && cfg.unlockGpgKeyOnLogin && hasKey;
 in
 {
-  config = lib.optionalAttrs hasConfig
+  config = lib.mkIf hasConfig
     {
       programs.git.userName = cfg.defaultIdentity.name;
       programs.git.userEmail = cfg.defaultIdentity.email;
-      programs.git.signing = lib.optionalAttrs hasKey {
+      programs.git.signing = lib.mkIf hasKey {
         signByDefault = true;
         key = gpgKey;
       };
-    } // lib.optionalAttrs unlockKey {
+    } // lib.mkIf unlockKey {
     xdg.configFile.pam-gnupg.text = ''
       ${gpgHome}
 

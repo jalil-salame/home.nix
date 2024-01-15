@@ -1,16 +1,16 @@
-{ stylix }: { config, pkgs, lib, ... }:
+{ stylix ? null }: { config, pkgs, lib, ... }:
 let
   cfg = config.jhome;
   devcfg = cfg.dev;
 in
 {
   imports = [
-    ../options.nix
+    ./options.nix
     ./gui
     ./users.nix
-  ] ++ lib.optional (cfg.enable && cfg.gui.enable) stylix.nixosModules.stylix;
+  ] ++ lib.optional (stylix != null) stylix.homeManagerModules.stylix;
 
-  config = lib.optionalAttrs cfg.enable {
+  config = lib.mkIf cfg.enable {
     # Direnv
     programs.direnv.enable = true;
     programs.direnv.nix-direnv.enable = true;
