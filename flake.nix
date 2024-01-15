@@ -30,7 +30,7 @@
       supportedSystems = [ "x86_64-linux" "aarch64-darwin" "x86_64-darwin" "aarch64-linux" ];
       forEachSupportedSystem = f: lib.genAttrs supportedSystems (system: f (import nixpkgs { inherit system; }));
       # Module documentation
-      doc = forEachSupportedSystem (pkgs: { doc = import ./docs { inherit pkgs lib; }; });
+      docs = forEachSupportedSystem (pkgs: import ./docs { inherit pkgs lib; });
     in
     {
       # Schemas tell Nix about the structure of your flake's outputs
@@ -38,7 +38,7 @@
 
       formatter = forEachSupportedSystem (pkgs: pkgs.nixpkgs-fmt);
 
-      packages = doc;
+      packages = docs;
 
       overlays = lib.genAttrs supportedSystems (system: final: prev: {
         inherit (jpassmenu.packages.${system}) jpassmenu;

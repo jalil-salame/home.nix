@@ -1,19 +1,22 @@
 { pkgs, lib, ... }:
 let
   eval = lib.evalModules { modules = [ ../home/options.nix ]; };
-  doc = (pkgs.nixosOptionsDoc {
+  markdown = (pkgs.nixosOptionsDoc {
     inherit (eval) options;
-    transformOptions = option: option // {visible = option.visible && builtins.elemAt option.loc 0 == "jhome";};
+    transformOptions = option: option // { visible = option.visible && builtins.elemAt option.loc 0 == "jhome"; };
   }).optionsCommonMark;
 in
-pkgs.stdenvNoCC.mkDerivation {
-  name = "home-manager-configuration-book";
-  src = ./.;
+{
+  inherit markdown;
+  doc = pkgs.stdenvNoCC.mkDerivation {
+    name = "home-manager-configuration-book";
+    src = ./.;
 
-  patchPhase = ''
-    # copy generated options removing the declared by statement
-    sed '/^\*Declared by:\*$/,/^$/d' <${doc} >> src/options.md
-  '';
+    patchPhase = ''
+      # copy generated options removing the declared by statement
+      sed '/^\*Declared by:\*$/,/^$/d' <${markdown} >> src/options.md
+    '';
 
-  buildPhase = "${pkgs.mdbook}/bin/mdbook build --dest-dir $out";
+    buildPhase = "${pkgs.mdbook}/bin/mdbook build --dest-dir $out";
+  };
 }
