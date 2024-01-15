@@ -117,4 +117,4 @@ builtins.foldl' (l: r: l // r)
     ++ resizeWindowKeybinds
     ++ focusWorkspaceKeybindings
     ++ moveWorkspaceKeybindings
-    ++ moveFocusWorkspaceKeybindings)
+  ++ moveFocusWorkspaceKeybindings)
