@@ -10,6 +10,7 @@
   inputs.nvim-config.url = "github:jalil-salame/nvim-config";
   inputs.nvim-config.inputs.nixpkgs.follows = "nixpkgs";
   inputs.nvim-config.inputs.home-manager.follows = "home-manager";
+  inputs.nvim-config.inputs.flake-schemas.follows = "flake-schemas";
 
   inputs.home-manager.url = "https://flakehub.com/f/nix-community/home-manager/0.1.*.tar.gz";
   inputs.home-manager.inputs.nixpkgs.follows = "nixpkgs";
