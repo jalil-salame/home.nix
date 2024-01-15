@@ -1,7 +1,10 @@
 { pkgs, lib, ... }:
 let
   eval = lib.evalModules { modules = [ ../home/options.nix ]; };
-  doc = (pkgs.nixosOptionsDoc { inherit (eval) options; }).optionsCommonMark;
+  doc = (pkgs.nixosOptionsDoc {
+    inherit (eval) options;
+    transformOptions = option: option // {visible = option.visible && builtins.elemAt option.loc 0 == "jhome";};
+  }).optionsCommonMark;
 in
 pkgs.stdenvNoCC.mkDerivation {
   name = "home-manager-configuration-book";
