@@ -8,7 +8,7 @@ let
 in
 {
   inherit markdown;
-  doc = pkgs.stdenvNoCC.mkDerivation {
+  docs = pkgs.stdenvNoCC.mkDerivation {
     name = "home-manager-configuration-book";
     src = ./.;
 
