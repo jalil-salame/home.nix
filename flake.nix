@@ -18,6 +18,7 @@
 
   inputs.jpassmenu.url = "github:jalil-salame/jpassmenu";
   inputs.jpassmenu.inputs.nixpkgs.follows = "nixpkgs";
+  inputs.jpassmenu.inputs.flake-schemas.follows = "flake-schemas";
 
   inputs.audiomenu.url = "github:jalil-salame/audiomenu";
   inputs.audiomenu.inputs.nixpkgs.follows = "nixpkgs";
@@ -34,7 +35,7 @@
     in
     {
       # Schemas tell Nix about the structure of your flake's outputs
-      schemas = flake-schemas.schemas;
+      inherit (flake-schemas) schemas;
 
       formatter = forEachSupportedSystem (pkgs: pkgs.nixpkgs-fmt);
 
@@ -43,7 +44,7 @@
       overlays = lib.genAttrs supportedSystems (system: final: prev: {
         inherit (jpassmenu.packages.${system}) jpassmenu;
         inherit (audiomenu.packages.${system}) audiomenu;
-      } // nvim-config final prev);
+      } // nvim-config.overlays.default final prev);
 
       nixosModules = rec {
         default = homeManagerModule;
