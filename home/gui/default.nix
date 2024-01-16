@@ -54,7 +54,7 @@ in
     '';
 
     # Auto configure displays
-    services.kanshi.enable = true;
+    services.kanshi.enable = lib.mkDefault true;
     # Notifications
     services.mako.enable = true;
     services.mako.layer = "overlay";
