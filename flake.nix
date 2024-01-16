@@ -42,12 +42,12 @@
 
       packages = docs;
 
-      overlays = lib.genAttrs supportedSystems (system: final: prev:
+      overlays.default = final: prev:
         jpassmenu.overlays.default final (
           audiomenu.overlays.default final (
             nvim-config.overlays.default final prev
           )
-        ));
+        );
 
       nixosModules = rec {
         default = homeManagerModule;
