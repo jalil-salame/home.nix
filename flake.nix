@@ -43,14 +43,11 @@
       packages = docs;
 
       overlays = lib.genAttrs supportedSystems (system: final: prev:
-        let
-          scripts = {
-            inherit (jpassmenu.packages.${system}) jpassmenu;
-            inherit (audiomenu.packages.${system}) audiomenu;
-          };
-          neovim = nvim-config.overlays.default final prev;
-        in
-        neovim // scripts);
+        jpassmenu.overlays.default final (
+          audiomenu.overlays.default final (
+            nvim-config.overlays.default final prev
+          )
+        ));
 
       nixosModules = rec {
         default = homeManagerModule;
