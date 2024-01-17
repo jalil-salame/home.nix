@@ -7,7 +7,7 @@ in
   imports = [
     # Apply overlays
     { nixpkgs = { inherit overlays; }; }
-    nvim-config.nixosModules.default
+    # nvim-config.nixosModules.default
     ./options.nix
     ./gui
     ./users.nix
