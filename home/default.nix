@@ -5,9 +5,9 @@ let
 in
 {
   imports = [
-    nvim-config.nixosModules.default
     # Apply overlays
     { nixpkgs = { inherit overlays; }; }
+    nvim-config.nixosModules.default
     ./options.nix
     ./gui
     ./users.nix
