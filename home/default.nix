@@ -5,15 +5,14 @@ let
 in
 {
   imports = [
+    # Apply overlays
+    { nixpkgs = { inherit overlays; }; }
     ./options.nix
     ./gui
     ./users.nix
   ] ++ lib.optional (stylix != null) stylix.homeManagerModules.stylix;
 
   config = lib.mkIf cfg.enable {
-    # Apply overlays
-    nixpkgs = { inherit overlays; };
-
     # Direnv
     programs.direnv.enable = true;
     programs.direnv.nix-direnv.enable = true;
