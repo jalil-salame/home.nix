@@ -44,12 +44,12 @@
 
       nixosModules =
         let
-          overlays = [ jpassmenu.overlays.default audiomenu.overlays.default nvim-config.overlays.default ];
-          homeManagerModule = import ./home { inherit overlays stylix; };
+          overlays = [ jpassmenu.overlays.default audiomenu.overlays.default ];
+          homeManagerModule = import ./home { inherit overlays nvim-config stylix; };
         in
         {
           default = homeManagerModule;
-          nixosModule = import ./home { inherit overlays; }; # provide stylix thourgh the nixos module
+          nixosModule = import ./home { inherit nvim-config overlays; }; # provide stylix thourgh the nixos module
         };
     };
 }

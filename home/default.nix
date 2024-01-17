@@ -1,10 +1,11 @@
-{ overlays, stylix ? null }: { config, pkgs, lib, ... }:
+{ overlays, nvim-config, stylix ? null }: { config, pkgs, lib, ... }:
 let
   cfg = config.jhome;
   devcfg = cfg.dev;
 in
 {
   imports = [
+    nvim-config.nixosModules.default
     # Apply overlays
     { nixpkgs = { inherit overlays; }; }
     ./options.nix
