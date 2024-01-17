@@ -44,7 +44,6 @@
       inherit (nixpkgs) lib;
       supportedSystems = [ "x86_64-linux" "aarch64-darwin" "x86_64-darwin" "aarch64-linux" ];
       forEachSupportedSystem = f: lib.genAttrs supportedSystems (system: f { pkgs = (import nixpkgs { inherit system; }); inherit system; });
-      # Module documentation
     in
     {
       # Schemas tell Nix about the structure of your flake's outputs
@@ -78,17 +77,12 @@
           nixosModule = import ./home { inherit nvim-config overlays; }; # provide stylix thourgh the nixos module
         };
 
-      packages = forEachSupportedSystem ({ pkgs, ... }: { inherit (pkgs.callPackage ./docs { }) docs markdown; })
-        // { "x86_64-linux".home-config = self.homeConfigurations.example.activationPackage; };
-
-      homeConfigurations.example =
-        let
-          system = "x86_64-linux";
-          overlays = builtins.attrValues self.overlays;
-          pkgs = import nixpkgs { inherit system overlays; };
-        in
-        home-manager.lib.homeManagerConfiguration {
-          inherit pkgs;
+      # Module documentation
+      packages = forEachSupportedSystem ({ pkgs, system }: {
+        inherit (pkgs.callPackage ./docs { }) docs markdown;
+        # TODO: breaks `nix flake show`
+        home-config = (home-manager.lib.homeManagerConfiguration {
+          pkgs = import nixpkgs { inherit system; overlays = builtins.attrValues self.overlays; };
           modules = [
             self.nixosModules.default
             ({ config, ... }: {
@@ -100,7 +94,8 @@
               jhome.enable = true;
             })
           ];
-        };
+        }).activationPackage;
+      });
 
       devShells = forEachSupportedSystem ({ pkgs, system }: { default = pkgs.mkShell { inherit (self.checks.${system}.pre-commit-check) shellHook; }; });
     };
