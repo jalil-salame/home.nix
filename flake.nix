@@ -33,13 +33,6 @@
       forEachSupportedSystem = f: lib.genAttrs supportedSystems (system: f (import nixpkgs { inherit system; }));
       # Module documentation
       docs = forEachSupportedSystem (pkgs: import ./docs { inherit pkgs lib; });
-      # Overlays
-      default = final: prev:
-        jpassmenu.overlays.default final (
-          audiomenu.overlays.default final (
-            nvim-config.overlays.default final prev
-          )
-        );
     in
     {
       # Schemas tell Nix about the structure of your flake's outputs
@@ -48,8 +41,6 @@
       formatter = forEachSupportedSystem (pkgs: pkgs.nixpkgs-fmt);
 
       packages = docs;
-
-      overlays = { inherit default; };
 
       nixosModules =
         let
