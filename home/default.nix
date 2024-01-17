@@ -11,7 +11,15 @@ in
     ./options.nix
     ./gui
     ./users.nix
-  ] ++ lib.optional (stylix != null) stylix.homeManagerModules.stylix;
+  ] ++ lib.optionals (stylix != null) [
+    stylix.homeManagerModules.stylix
+    {
+      stylix.image = builtins.fetchurl {
+        url = "https://raw.githubusercontent.com/lunik1/nixos-logo-gruvbox-wallpaper/d4937c424fad79c1136a904599ba689fcf8d0fad/png/gruvbox-dark-rainbow.png";
+        sha256 = "036gqhbf6s5ddgvfbgn6iqbzgizssyf7820m5815b2gd748jw8zc";
+      };
+    }
+  ];
 
   config = lib.mkIf cfg.enable {
     # Direnv
