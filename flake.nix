@@ -42,6 +42,13 @@
 
       packages = docs;
 
+      overlays = {
+        nixneovim = nvim-config.overlays.nixneovim;
+        neovim-nightly = nvim-config.overlays.neovim-nightly;
+        jpassmenu = jpassmenu.overlays.default;
+        audiomenu = audiomenu.overlays.default;
+      };
+
       nixosModules =
         let
           overlays = [
