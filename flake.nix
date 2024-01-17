@@ -33,6 +33,13 @@
       forEachSupportedSystem = f: lib.genAttrs supportedSystems (system: f (import nixpkgs { inherit system; }));
       # Module documentation
       docs = forEachSupportedSystem (pkgs: import ./docs { inherit pkgs lib; });
+      # Overlays
+      default = final: prev:
+        jpassmenu.overlays.default final (
+          audiomenu.overlays.default final (
+            nvim-config.overlays.default final prev
+          )
+        );
     in
     {
       # Schemas tell Nix about the structure of your flake's outputs
@@ -42,17 +49,16 @@
 
       packages = docs;
 
-      overlays.default = final: prev:
-        jpassmenu.overlays.default final (
-          audiomenu.overlays.default final (
-            nvim-config.overlays.default final prev
-          )
-        );
+      overlays = { inherit default; };
 
-      nixosModules = rec {
-        default = homeManagerModule;
-        nixosModule = import ./home { }; # provide stylix thourgh the nixos module
-        homeManagerModule = import ./home { inherit stylix; };
-      };
+      nixosModules =
+        let
+          overlays = [ default ];
+          homeManagerModule = import ./home { inherit overlays stylix; };
+        in
+        {
+          default = homeManagerModule;
+          nixosModule = import ./home { inherit overlays; }; # provide stylix thourgh the nixos module
+        };
     };
 }

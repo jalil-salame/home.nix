@@ -1,4 +1,4 @@
-{ stylix ? null }: { config, pkgs, lib, ... }:
+{ overlays, stylix ? null }: { config, pkgs, lib, ... }:
 let
   cfg = config.jhome;
   devcfg = cfg.dev;
@@ -11,6 +11,9 @@ in
   ] ++ lib.optional (stylix != null) stylix.homeManagerModules.stylix;
 
   config = lib.mkIf cfg.enable {
+    # Apply overlays
+    nixpkgs = { inherit overlays; };
+
     # Direnv
     programs.direnv.enable = true;
     programs.direnv.nix-direnv.enable = true;
