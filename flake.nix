@@ -7,6 +7,14 @@
 
   inputs.nixpkgs.url = "https://flakehub.com/f/NixOS/nixpkgs/0.1.*.tar.gz";
 
+  inputs.jpassmenu.url = "github:jalil-salame/jpassmenu";
+  inputs.jpassmenu.inputs.nixpkgs.follows = "nixpkgs";
+  inputs.jpassmenu.inputs.flake-schemas.follows = "flake-schemas";
+
+  inputs.audiomenu.url = "github:jalil-salame/audiomenu";
+  inputs.audiomenu.inputs.nixpkgs.follows = "nixpkgs";
+  inputs.audiomenu.inputs.flake-schemas.follows = "flake-schemas";
+
   inputs.nvim-config.url = "github:jalil-salame/nvim-config";
   inputs.nvim-config.inputs.nixpkgs.follows = "nixpkgs";
   inputs.nvim-config.inputs.home-manager.follows = "home-manager";
@@ -17,15 +25,20 @@
 
   inputs.flake-schemas.url = "https://flakehub.com/f/DeterminateSystems/flake-schemas/*.tar.gz";
 
-  inputs.jpassmenu.url = "github:jalil-salame/jpassmenu";
-  inputs.jpassmenu.inputs.nixpkgs.follows = "nixpkgs";
-  inputs.jpassmenu.inputs.flake-schemas.follows = "flake-schemas";
+  inputs.pre-commit-hooks.url = "github:cachix/pre-commit-hooks.nix";
+  inputs.pre-commit-hooks.inputs.nixpkgs.follows = "nixpkgs";
 
-  inputs.audiomenu.url = "github:jalil-salame/audiomenu";
-  inputs.audiomenu.inputs.nixpkgs.follows = "nixpkgs";
-  inputs.audiomenu.inputs.flake-schemas.follows = "flake-schemas";
-
-  outputs = { self, nixpkgs, flake-schemas, stylix, nvim-config, jpassmenu, audiomenu, home-manager }:
+  outputs =
+    { self
+    , nixpkgs
+    , flake-schemas
+    , stylix
+    , nvim-config
+    , jpassmenu
+    , audiomenu
+    , home-manager
+    , pre-commit-hooks
+    }:
     let
       # Helpers for producing system-specific outputs
       inherit (nixpkgs) lib;
@@ -36,6 +49,15 @@
     {
       # Schemas tell Nix about the structure of your flake's outputs
       inherit (flake-schemas) schemas;
+
+      checks = forEachSupportedSystem ({ pkgs, system }:
+        let src = builtins.path { path = ./.; name = "home.nix"; }; in
+        {
+          pre-commit-check = pre-commit-hooks.lib.${system}.run {
+            inherit src;
+            hooks.nixpkgs-fmt.enable = true;
+          };
+        });
 
       formatter = forEachSupportedSystem ({ pkgs, ... }: pkgs.nixpkgs-fmt);
 
@@ -56,7 +78,8 @@
           nixosModule = import ./home { inherit nvim-config overlays; }; # provide stylix thourgh the nixos module
         };
 
-      packages = forEachSupportedSystem ({ pkgs, ... }: { inherit (pkgs.callPackage ./docs {}) docs markdown; });
+      packages = forEachSupportedSystem ({ pkgs, ... }: { inherit (pkgs.callPackage ./docs { }) docs markdown; })
+        // { "x86_64-linux".home-config = self.homeConfigurations.example.activationPackage; };
 
       homeConfigurations.example =
         let
@@ -78,5 +101,7 @@
             })
           ];
         };
+
+      devShells = forEachSupportedSystem ({ pkgs, system }: { default = pkgs.mkShell { inherit (self.checks.${system}.pre-commit-check) shellHook; }; });
     };
 }
