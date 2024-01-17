@@ -25,22 +25,19 @@
   inputs.audiomenu.inputs.nixpkgs.follows = "nixpkgs";
   inputs.audiomenu.inputs.flake-schemas.follows = "flake-schemas";
 
-  outputs = { nixpkgs, flake-schemas, stylix, nvim-config, jpassmenu, audiomenu, ... }:
+  outputs = { self, nixpkgs, flake-schemas, stylix, nvim-config, jpassmenu, audiomenu, home-manager }:
     let
       # Helpers for producing system-specific outputs
       inherit (nixpkgs) lib;
       supportedSystems = [ "x86_64-linux" "aarch64-darwin" "x86_64-darwin" "aarch64-linux" ];
-      forEachSupportedSystem = f: lib.genAttrs supportedSystems (system: f (import nixpkgs { inherit system; }));
+      forEachSupportedSystem = f: lib.genAttrs supportedSystems (system: f { pkgs = (import nixpkgs { inherit system; }); inherit system; });
       # Module documentation
-      docs = forEachSupportedSystem (pkgs: import ./docs { inherit pkgs lib; });
     in
     {
       # Schemas tell Nix about the structure of your flake's outputs
       inherit (flake-schemas) schemas;
 
-      formatter = forEachSupportedSystem (pkgs: pkgs.nixpkgs-fmt);
-
-      packages = docs;
+      formatter = forEachSupportedSystem ({ pkgs, ... }: pkgs.nixpkgs-fmt);
 
       overlays = {
         nixneovim = nvim-config.overlays.nixneovim;
@@ -51,17 +48,35 @@
 
       nixosModules =
         let
-          overlays = [
-            jpassmenu.overlays.default
-            audiomenu.overlays.default
-            nvim-config.overlays.nixneovim
-            nvim-config.overlays.neovim-nightly
-          ];
+          overlays = builtins.attrValues self.overlays;
           homeManagerModule = import ./home { inherit overlays nvim-config stylix; };
         in
         {
           default = homeManagerModule;
           nixosModule = import ./home { inherit nvim-config overlays; }; # provide stylix thourgh the nixos module
+        };
+
+      packages = forEachSupportedSystem ({ pkgs, ... }: { inherit (pkgs.callPackage ./docs {}) docs markdown; });
+
+      homeConfigurations.example =
+        let
+          system = "x86_64-linux";
+          overlays = builtins.attrValues self.overlays;
+          pkgs = import nixpkgs { inherit system overlays; };
+        in
+        home-manager.lib.homeManagerConfiguration {
+          inherit pkgs;
+          modules = [
+            self.nixosModules.default
+            ({ config, ... }: {
+              home.username = "example";
+              home.homeDirectory = "/home/${config.home.username}";
+
+              programs.home-manager.enable = true;
+
+              jhome.enable = true;
+            })
+          ];
         };
     };
 }
