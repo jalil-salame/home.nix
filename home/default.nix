@@ -66,6 +66,8 @@ in
     services.spotifyd.settings.global.backend = "pulseaudio";
     services.spotifyd.settings.global.zeroconf_port = 2020;
 
+    home.stateVersion = "22.11";
+
     # Extra packages
     home.packages = [
       pkgs.gopass
