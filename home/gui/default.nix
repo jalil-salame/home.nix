@@ -17,6 +17,7 @@ in
       pkgs.xournalpp
       pkgs.signal-desktop
       pkgs.lxqt.pcmanfm-qt
+      pkgs.wl-clipboard
     ] ++ lib.optional flatpakEnabled pkgs.flatpak;
 
     fonts.fontconfig.enable = true;
