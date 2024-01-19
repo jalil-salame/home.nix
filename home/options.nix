@@ -122,8 +122,8 @@ in
         };
         user = lib.mkOption {
           description = lib.mdDoc "User settings.";
-          default = { };
-          type = types.submodule user;
+          default = null;
+          type = types.nullOr (types.submodule user);
         };
         gui = lib.mkOption {
           description = lib.mdDoc "Jalil's default GUI configuration.";
