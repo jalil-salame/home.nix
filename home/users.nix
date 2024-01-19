@@ -10,7 +10,7 @@ let
   unlockKey = hasConfig && cfg.unlockGpgKeyOnLogin && hasKey;
 in
 {
-  imports = [
+  config = lib.mkMerge [
     (lib.mkIf hasConfig {
       programs.git.userName = cfg.defaultIdentity.name;
       programs.git.userEmail = cfg.defaultIdentity.email;
